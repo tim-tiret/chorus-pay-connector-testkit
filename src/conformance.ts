@@ -9,6 +9,28 @@ import { createMockCtx } from "./mock-ctx.js";
 import { samplePayLink } from "./fixtures.js";
 
 /**
+ * Types d'événements du catalogue Chorus Pay auxquels un hook peut s'accrocher
+ * (mêmes événements que les webhooks). Tenu à jour avec lib/events/catalog.ts.
+ * Les événements techniques (webhook.test, purchase_order) sont exclus.
+ */
+const KNOWN_EVENT_TYPES = new Set<string>([
+  // pay_link
+  "pay_link.created", "pay_link.sent", "pay_link.viewed", "pay_link.quote_email_sent",
+  "pay_link.accepted", "pay_link.rejected", "pay_link.cancelled", "pay_link.recycled",
+  "pay_link.expired", "pay_link.marked_as_paid", "pay_link.status_updated",
+  "pay_link.scheduled_date_updated", "pay_link.purchase_order_uploaded",
+  "pay_link.purchase_order_uploaded_by_client", "pay_link.purchase_order_analysed",
+  // invoice
+  "invoice.created", "invoice.deposited", "invoice.deposited_verified", "invoice.validated",
+  "invoice.paid", "invoice.rejected", "invoice.action_required", "invoice.deposit_failed",
+  "invoice.creation.failed", "invoice.chorus_status_updated",
+  "invoice.created_in_pennylane", "invoice.pennylane_creation_failed",
+  "invoice.created_in_dolibarr", "invoice.dolibarr_creation_failed",
+  // identity
+  "identity.verified",
+]);
+
+/**
  * Kit de conformité : vérifie qu'un connecteur respecte le protocole
  * (doc/connectors/CONNECTOR_SPEC.md) sans DB ni réseau. À exécuter en CI de
  * chaque repo de connecteur (scripts/connector/test.mjs pour les in-repo).
@@ -207,6 +229,18 @@ export async function runConformance(def: ConnectorDefinition): Promise<Conforma
   for (const el of def.manifest.configFields) {
     if (el.type === "action" && !def.actions?.[el.key]) {
       error("actions", `bouton d'action "${el.key}" sans handler`);
+    }
+  }
+
+  // 9. Hooks : les clés doivent correspondre à un type d'événement du
+  // catalogue Chorus Pay. Une clé inconnue (faute de frappe) ne se
+  // déclencherait jamais en silence — on la signale.
+  for (const key of Object.keys(def.hooks ?? {})) {
+    if (!KNOWN_EVENT_TYPES.has(key)) {
+      warning(
+        "hooks",
+        `hook "${key}" ne correspond à aucun type d'événement connu — il ne se déclenchera jamais (voir la liste dans la doc)`,
+      );
     }
   }
 
