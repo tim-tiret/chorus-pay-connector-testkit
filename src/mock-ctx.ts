@@ -10,7 +10,7 @@ import type {
   PayLinkDto,
 } from "@chorus-pay/connector-sdk";
 import { ConnectorHttpError } from "@chorus-pay/connector-sdk";
-import { samplePayLink, sampleSupplierProfile } from "./fixtures";
+import { samplePayLink, sampleSupplierProfile } from "./fixtures.js";
 
 /**
  * Mock du ConnectorCtx pour le kit de conformité : kv/config/invoices en

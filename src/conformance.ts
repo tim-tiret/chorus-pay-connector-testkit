@@ -5,8 +5,8 @@ import {
   flattenFields,
   serializeManifest,
 } from "@chorus-pay/connector-sdk";
-import { createMockCtx } from "./mock-ctx";
-import { samplePayLink } from "./fixtures";
+import { createMockCtx } from "./mock-ctx.js";
+import { samplePayLink } from "./fixtures.js";
 
 /**
  * Kit de conformité : vérifie qu'un connecteur respecte le protocole
@@ -171,7 +171,7 @@ export async function runConformance(def: ConnectorDefinition): Promise<Conforma
             "doit no-op en succès quand le pay link ne concerne pas la boutique (kv vide)"
           );
         }
-        if (calls.some((c) => c.surface === "http.fetch")) {
+        if (calls.some((c: { surface: string }) => c.surface === "http.fetch")) {
           warning(
             `shop.${gateName}`,
             "appel HTTP effectué pour un pay link hors périmètre — le no-op doit être rapide"

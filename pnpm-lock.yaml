@@ -1,0 +1,73 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    devDependencies:
+      '@chorus-pay/connector-sdk':
+        specifier: file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz
+        version: file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz(zod@3.25.76)
+      '@chorus-pay/connector-testkit':
+        specifier: file:/Users/timotheemonnier/Documents/Logiciels/Projets/chorus_pay/Dev/chorus-pay-connector-testkit/chorus-pay-connector-testkit-1.0.1.tgz
+        version: file:chorus-pay-connector-testkit-1.0.1.tgz(@chorus-pay/connector-sdk@file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz(zod@3.25.76))
+      '@types/node':
+        specifier: ^22.0.0
+        version: 22.20.0
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      zod:
+        specifier: ^3.25.0
+        version: 3.25.76
+
+packages:
+
+  '@chorus-pay/connector-sdk@file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz':
+    resolution: {integrity: sha512-RmpwBD13EaleCjInpM+UwQDR5srKVqUV39RpGjNMFbUI46MnES6E3QEZlPyJL70pjwStERHpW80vW3JXxHl/7A==, tarball: file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz}
+    version: 1.0.2
+    peerDependencies:
+      zod: ^3.25.0
+
+  '@chorus-pay/connector-testkit@file:chorus-pay-connector-testkit-1.0.1.tgz':
+    resolution: {integrity: sha512-L4cu+zTXI5SUOTCi0V4rNWAgczAg7x379juHld7P7o9Qd3GiHPDVB1mN9hx9nvVSXk6d49QG8oPXI2kHUWmJpw==, tarball: file:chorus-pay-connector-testkit-1.0.1.tgz}
+    version: 1.0.1
+    peerDependencies:
+      '@chorus-pay/connector-sdk': file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz
+
+  '@types/node@22.20.0':
+    resolution: {integrity: sha512-QWlFW2wf3nTjC13/DqRnBpR4ZO36VJH/JVBkA/vcnmbTBNQIlnObqyqZE1tUR7+Ni23Lda8R1BxMfbXRpCUx5g==}
+
+  typescript@5.9.3:
+    resolution: {integrity: sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw==}
+    engines: {node: '>=14.17'}
+    hasBin: true
+
+  undici-types@6.21.0:
+    resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
+
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
+snapshots:
+
+  '@chorus-pay/connector-sdk@file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz(zod@3.25.76)':
+    dependencies:
+      zod: 3.25.76
+
+  '@chorus-pay/connector-testkit@file:chorus-pay-connector-testkit-1.0.1.tgz(@chorus-pay/connector-sdk@file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz(zod@3.25.76))':
+    dependencies:
+      '@chorus-pay/connector-sdk': file:../chorus-pay-connector-sdk/chorus-pay-connector-sdk-1.0.2.tgz(zod@3.25.76)
+
+  '@types/node@22.20.0':
+    dependencies:
+      undici-types: 6.21.0
+
+  typescript@5.9.3: {}
+
+  undici-types@6.21.0: {}
+
+  zod@3.25.76: {}
