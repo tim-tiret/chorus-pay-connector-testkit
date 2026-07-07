@@ -7,6 +7,7 @@ import type {
   InvoiceDto,
   JsonObject,
   JsonValue,
+  ManagedWebhook,
   PayLinkDto,
 } from "@chorus-pay/connector-sdk";
 import { ConnectorHttpError } from "@chorus-pay/connector-sdk";
@@ -59,6 +60,7 @@ export interface MockCtx {
     events: ConnectorEventInput[];
     savedPdfs: Array<{ invoiceId: string; payLinkId: string; filename: string; size: number }>;
     createdPayLinks: CreatePayLinkDto[];
+    webhooks: ManagedWebhook[];
   };
 }
 
@@ -85,12 +87,15 @@ export function createMockCtx(options: MockCtxOptions = {}): MockCtx {
     events: [],
     savedPdfs: [],
     createdPayLinks: [],
+    webhooks: [],
   };
 
   const payLinks = options.payLinks ?? [samplePayLink()];
   const supplierId = options.supplierId ?? 4242;
   let invoiceCounter = 0;
   let payLinkCounter = 0;
+  let webhookCounter = 0;
+  const MAX_WEBHOOKS_PER_INSTALLATION = 5;
 
   const ctx: ConnectorCtx = {
     installation: {
@@ -269,6 +274,55 @@ export function createMockCtx(options: MockCtxOptions = {}): MockCtx {
       async delete(key) {
         record("kv.delete", key);
         state.kv.delete(key);
+      },
+    },
+
+    webhooks: {
+      async create(input) {
+        record("webhooks.create", input);
+        if (state.webhooks.length >= MAX_WEBHOOKS_PER_INSTALLATION) {
+          throw new Error(
+            `[testkit] plafond de ${MAX_WEBHOOKS_PER_INSTALLATION} webhooks par installation atteint`
+          );
+        }
+        if (!/^https:\/\//.test(input.url)) {
+          throw new Error("[testkit] webhook url must be https://");
+        }
+        webhookCounter++;
+        const webhook: ManagedWebhook = {
+          id: `wh_testkit${String(webhookCounter).padStart(4, "0")}`,
+          url: input.url,
+          description: input.description ?? null,
+          events: { ...input.events },
+          enabled: true,
+          secret: `whsec_testkit${String(webhookCounter).padStart(4, "0")}`,
+          createdAt: "2026-01-01T00:00:00.000Z",
+        };
+        state.webhooks.push(webhook);
+        return { ...webhook, events: { ...webhook.events } };
+      },
+      async list() {
+        record("webhooks.list");
+        return state.webhooks.map((w) => ({ ...w, events: { ...w.events } }));
+      },
+      async update(id, patch) {
+        record("webhooks.update", id, patch);
+        const webhook = state.webhooks.find((w) => w.id === id);
+        if (!webhook) throw new Error(`[testkit] webhook inconnu: ${id}`);
+        if (patch.url !== undefined) {
+          if (!/^https:\/\//.test(patch.url)) {
+            throw new Error("[testkit] webhook url must be https://");
+          }
+          webhook.url = patch.url;
+        }
+        if (patch.events !== undefined) webhook.events = { ...patch.events };
+        if (patch.enabled !== undefined) webhook.enabled = patch.enabled;
+        if (patch.description !== undefined) webhook.description = patch.description;
+        return { ...webhook, events: { ...webhook.events } };
+      },
+      async delete(id) {
+        record("webhooks.delete", id);
+        state.webhooks = state.webhooks.filter((w) => w.id !== id);
       },
     },
   };

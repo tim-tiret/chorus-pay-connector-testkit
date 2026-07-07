@@ -244,6 +244,79 @@ export async function runConformance(def: ConnectorDefinition): Promise<Conforma
     }
   }
 
+  // 10. OAuth entrant : cohérence manifest ↔ lifecycle
+  const inbound = def.manifest.inboundOauth;
+  if (inbound) {
+    if (!def.lifecycle?.onOauthConnected) {
+      warning(
+        "inboundOauth",
+        "inboundOauth déclaré sans lifecycle.onOauthConnected — rien ne sera provisionné à la connexion"
+      );
+    }
+    if (inbound.redirectUris.includes("*")) {
+      warning(
+        "inboundOauth",
+        'redirectUris ["*"] accepte tout domaine — justifié seulement pour les apps auto-hébergées'
+      );
+    }
+  } else if (def.lifecycle) {
+    warning(
+      "lifecycle",
+      "lifecycle déclaré sans manifest.inboundOauth — les handlers ne seront jamais invoqués"
+    );
+  }
+
+  // 11. onOauthConnected : idempotence (invoqué à CHAQUE connexion/reconnexion
+  // OAuth — deux appels doivent converger : même webhook, même secret) et
+  // contrat de retour (tokenResponseExtras = valeurs string plates).
+  if (def.lifecycle?.onOauthConnected) {
+    try {
+      const { ctx, state } = createMockCtx({ config: {} });
+      const event = {
+        shopUrl: "https://boutique.example.test",
+        scopes: inbound?.scopes ?? ["pay_links", "webhooks"],
+        clientId: inbound?.clientId ?? "testkit_client",
+      };
+      const first = await def.lifecycle.onOauthConnected(ctx, event);
+      const webhooksAfterFirst = state.webhooks.length;
+      const second = await def.lifecycle.onOauthConnected(ctx, event);
+      if (state.webhooks.length !== webhooksAfterFirst) {
+        error(
+          "lifecycle.onOauthConnected",
+          `non idempotent : ${webhooksAfterFirst} webhook(s) après le 1er appel, ` +
+            `${state.webhooks.length} après le 2e (une reconnexion ne doit pas dupliquer)`
+        );
+      }
+      for (const result of [first, second]) {
+        if (!result) continue;
+        const serErr = isSerializable(result);
+        if (serErr) error("lifecycle.onOauthConnected.serializable", serErr);
+        for (const [key, value] of Object.entries(result.tokenResponseExtras ?? {})) {
+          if (typeof value !== "string") {
+            error(
+              "lifecycle.onOauthConnected",
+              `tokenResponseExtras.${key} doit être une string (valeurs plates uniquement)`
+            );
+          }
+        }
+      }
+      const firstSecret = first?.tokenResponseExtras?.webhook_secret;
+      const secondSecret = second?.tokenResponseExtras?.webhook_secret;
+      if (firstSecret && secondSecret && firstSecret !== secondSecret) {
+        error(
+          "lifecycle.onOauthConnected",
+          "webhook_secret différent entre deux connexions — la reconnexion doit renvoyer le secret existant"
+        );
+      }
+    } catch (e) {
+      error(
+        "lifecycle.onOauthConnected",
+        `a jeté : ${e instanceof Error ? e.message : String(e)} — un échec ne doit ` +
+          "jamais casser la délivrance du token, retourner proprement"
+      );
+    }
+  }
+
   return {
     connector: def.manifest.id,
     ok: issues.every((i) => i.level !== "error"),
