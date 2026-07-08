@@ -61,6 +61,7 @@ export interface MockCtx {
     savedPdfs: Array<{ invoiceId: string; payLinkId: string; filename: string; size: number }>;
     createdPayLinks: CreatePayLinkDto[];
     webhooks: ManagedWebhook[];
+    sentQuoteEmails: string[];
   };
 }
 
@@ -88,6 +89,7 @@ export function createMockCtx(options: MockCtxOptions = {}): MockCtx {
     savedPdfs: [],
     createdPayLinks: [],
     webhooks: [],
+    sentQuoteEmails: [],
   };
 
   const payLinks = options.payLinks ?? [samplePayLink()];
@@ -103,6 +105,9 @@ export function createMockCtx(options: MockCtxOptions = {}): MockCtx {
       connectorId: options.connectorId ?? "testkit",
       supplierId,
       name: "testkit",
+      routesBaseUrl: `https://chorus-pay.test/api/connectors/${
+        options.installationId ?? "cinst_testkit000000000000000000000000"
+      }`,
     },
 
     config: {
@@ -199,6 +204,11 @@ export function createMockCtx(options: MockCtxOptions = {}): MockCtx {
               expires_at: found.expires_at,
             }
           : null;
+      },
+      async sendQuoteEmail(payLinkId) {
+        record("payLinks.sendQuoteEmail", payLinkId);
+        state.sentQuoteEmails.push(payLinkId);
+        return { success: true };
       },
     },
 
