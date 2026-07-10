@@ -259,10 +259,16 @@ export async function runConformance(def: ConnectorDefinition): Promise<Conforma
         'redirectUris ["*"] accepte tout domaine — justifié seulement pour les apps auto-hébergées'
       );
     }
-  } else if (def.lifecycle) {
+  } else if (
+    def.lifecycle &&
+    (def.lifecycle.onOauthConnected || def.lifecycle.onOauthRevoked)
+  ) {
+    // Les hooks d'installation (onInstall/onEnable/onDisable/onUninstall/
+    // onConfigSaved) sont invoqués par le core sans inboundOauth ; seuls les
+    // hooks OAuth entrants n'ont pas de sens sans manifest.inboundOauth.
     warning(
       "lifecycle",
-      "lifecycle déclaré sans manifest.inboundOauth — les handlers ne seront jamais invoqués"
+      "hooks OAuth (onOauthConnected/onOauthRevoked) déclarés sans manifest.inboundOauth — ils ne seront jamais invoqués"
     );
   }
 
