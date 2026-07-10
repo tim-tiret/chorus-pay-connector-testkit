@@ -1,6 +1,6 @@
 {
   "name": "@chorus-pay/connector-testkit",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Kit de conformité et mock du ctx pour tester des connecteurs Chorus Pay",
   "license": "MIT",
   "type": "module",
