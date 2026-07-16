@@ -29,7 +29,6 @@ export function samplePayLink(overrides: Partial<PayLinkDto> = {}): PayLinkDto {
     ],
     metadata: null,
     purchase_order_analysis: null,
-    test_mode: false,
     source: "manual",
     url: "pl_testkit0000000000000000000000001",
     shipping_address: null,
