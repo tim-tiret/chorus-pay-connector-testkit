@@ -1,6 +1,6 @@
 {
   "name": "@chorus-pay/connector-testkit",
-  "version": "1.2.1",
+  "version": "2.0.0",
   "description": "Kit de conformité et mock du ctx pour tester des connecteurs Chorus Pay",
   "license": "MIT",
   "type": "module",
@@ -41,10 +41,10 @@
   },
   "homepage": "https://choruspay.fr/doc/connecteurs",
   "peerDependencies": {
-    "@chorus-pay/connector-sdk": "^1.2.0"
+    "@chorus-pay/connector-sdk": "^2.0.0"
   },
   "devDependencies": {
-    "@chorus-pay/connector-sdk": "^1.2.0",
+    "@chorus-pay/connector-sdk": "^2.0.0",
     "@types/node": "^22.0.0",
     "typescript": "^5.6.0",
     "zod": "^3.25.0"
