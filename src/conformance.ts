@@ -17,8 +17,8 @@ const KNOWN_EVENT_TYPES = new Set<string>([
   // Catalogue du 15/09/2026 (12 types, ORDER_TIMELINE_PLAN.md du core)
   "order.created", "order.identified", "order.viewed", "order.message_sent",
   "order.purchase_order_uploaded", "order.accepted", "order.cancelled",
-  "identity.verified", "invoice.created", "invoice.deposited", "invoice.failed",
-  "invoice.status_updated",
+  "identity.answered", "identity.verified", "invoice.created", "invoice.deposited",
+  "invoice.failed", "invoice.status_updated",
   // Anciens noms, encore livrés par traduction aux abonnés qui les citent
   // pay_link
   "pay_link.created", "pay_link.sent", "pay_link.viewed", "pay_link.quote_email_sent",
