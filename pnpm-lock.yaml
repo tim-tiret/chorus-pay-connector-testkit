@@ -9,8 +9,8 @@ importers:
   .:
     devDependencies:
       '@chorus-pay/connector-sdk':
-        specifier: ^2.0.0
-        version: 2.0.0(zod@3.25.76)
+        specifier: ^2.2.0
+        version: 2.2.0(zod@3.25.76)
       '@types/node':
         specifier: ^22.0.0
         version: 22.20.0
@@ -23,8 +23,8 @@ importers:
 
 packages:
 
-  '@chorus-pay/connector-sdk@2.0.0':
-    resolution: {integrity: sha512-LRsIIy6u4VkjQIdhm7axqBcVnansCU94HpseSFcSJmrln+YETgSxkIl7V1HJKWI5rSfnRJti+UbJtB3Kd9G3YA==}
+  '@chorus-pay/connector-sdk@2.2.0':
+    resolution: {integrity: sha512-qqifOrX6+tLIYXtEk1ntR1g1tEsNKsWOKsUFg8pXlsW76y4T8nYSlboRvdPH8G9aXk90BK+1qEckVa44b334rQ==}
     peerDependencies:
       zod: ^3.25.0
 
@@ -44,7 +44,7 @@ packages:
 
 snapshots:
 
-  '@chorus-pay/connector-sdk@2.0.0(zod@3.25.76)':
+  '@chorus-pay/connector-sdk@2.2.0(zod@3.25.76)':
     dependencies:
       zod: 3.25.76
 

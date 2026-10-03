@@ -210,6 +210,19 @@ export function createMockCtx(options: MockCtxOptions = {}): MockCtx {
         state.sentQuoteEmails.push(payLinkId);
         return { success: true };
       },
+      async cancel(payLinkId) {
+        record("payLinks.cancel", payLinkId);
+        const found = payLinks.find((p) => p.id === payLinkId);
+        if (!found) return { outcome: "not_found" as const };
+        if (found.status === "cancelled") {
+          return { outcome: "already_cancelled" as const };
+        }
+        if (found.status === "invoiced" || found.status === "paid") {
+          return { outcome: "not_cancellable" as const };
+        }
+        found.status = "cancelled";
+        return { outcome: "cancelled" as const };
+      },
     },
 
     invoices: {
