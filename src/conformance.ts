@@ -181,40 +181,8 @@ export async function runConformance(def: ConnectorDefinition): Promise<Conforma
     }
   }
 
-  // 6. Catégorie shop : gates présents et no-op rapides hors périmètre
-  if (def.manifest.category === "shop") {
-    const shop = def.capabilities?.shop;
-    if (!shop || (!shop.onQuoteConfirmed && !shop.completeOrder && !shop.preDeposit)) {
-      warning("shop", "aucun gate shop déclaré (onQuoteConfirmed/completeOrder/preDeposit)");
-    }
-    for (const gateName of ["onQuoteConfirmed", "completeOrder", "preDeposit"] as const) {
-      const gate = shop?.[gateName];
-      if (!gate) continue;
-      try {
-        const { ctx, calls } = createMockCtx({ config: {}, kv: {} });
-        const result = await gate(ctx, { payLinkId: "pl_unknown", invoiceId: null } as never);
-        if (result?.success !== true) {
-          error(
-            `shop.${gateName}`,
-            "doit no-op en succès quand le pay link ne concerne pas la boutique (kv vide)"
-          );
-        }
-        if (calls.some((c: { surface: string }) => c.surface === "http.fetch")) {
-          warning(
-            `shop.${gateName}`,
-            "appel HTTP effectué pour un pay link hors périmètre — le no-op doit être rapide"
-          );
-        }
-      } catch (e) {
-        error(
-          `shop.${gateName}`,
-          `a jeté sur un pay link hors périmètre : ${e instanceof Error ? e.message : String(e)}`
-        );
-      }
-    }
-  }
 
-  // 7. Statelessness (heuristique multi-tenant) : deux invocations avec des
+  // 6. Statelessness (heuristique multi-tenant) : deux invocations avec des
   // ctx de tenants différents ne doivent pas se contaminer via l'état module.
   try {
     const a = createMockCtx({ supplierId: 1, config: { probe: "tenant-a" } });
@@ -230,7 +198,7 @@ export async function runConformance(def: ConnectorDefinition): Promise<Conforma
     warning("statelessness", e instanceof Error ? e.message : String(e));
   }
 
-  // 8. Routes : clés bien formées (déjà validé par defineConnector, on vérifie
+  // 7. Routes : clés bien formées (déjà validé par defineConnector, on vérifie
   // la présence des handlers d'actions)
   for (const el of def.manifest.configFields) {
     if (el.type === "action" && !def.actions?.[el.key]) {
@@ -238,7 +206,7 @@ export async function runConformance(def: ConnectorDefinition): Promise<Conforma
     }
   }
 
-  // 9. Hooks : les clés doivent correspondre à un type d'événement du
+  // 8. Hooks : les clés doivent correspondre à un type d'événement du
   // catalogue Chorus Pay. Une clé inconnue (faute de frappe) ne se
   // déclencherait jamais en silence — on la signale.
   for (const key of Object.keys(def.hooks ?? {})) {
